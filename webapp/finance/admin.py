@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.db.models.loading import get_models, get_app
-from finance.models import Balance, Payment
+from finance.models import Balance, Payment, VokoExpense, VokoIncome
 
 for model in get_models(get_app('finance')):
-    if model in (Balance, Payment):
+    if model in (Balance, Payment, VokoExpense, VokoIncome):
         continue
 
     admin.site.register(model)
@@ -82,6 +82,14 @@ class PaymentAdmin(admin.ModelAdmin):
     list_filter = ("succeeded",)
 
 
+class VokoBalanceAdmin(admin.ModelAdmin):
+    list_display = ["created", "amount", "description",  "order_round", "supplier", "user_balance"]
+    list_filter = ("order_round", "supplier")
+    ordering = ("-id", )
+
+
 admin.site.register(Balance, BalanceAdmin)
 admin.site.register(Payment, PaymentAdmin)
+admin.site.register(VokoIncome, VokoBalanceAdmin)
+admin.site.register(VokoExpense, VokoBalanceAdmin)
 

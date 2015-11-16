@@ -4,6 +4,7 @@ from django_extensions.db.models import TimeStampedModel
 
 
 class Payment(TimeStampedModel):
+    """ Payment by a user  """
     # TODO link to balance model
     amount = models.DecimalField(max_digits=6, decimal_places=2)
     order = models.ForeignKey("ordering.Order", null=True, related_name="payments")
@@ -47,6 +48,7 @@ class BalanceManager(models.Manager):
 
 
 class Balance(TimeStampedModel):
+    """ User Balance. Should be renamed to UserBalance (TODO) """
     # TODO: add sanity check; amount may never be negative.
     TYPES = (
         ("CR", "Credit"),
@@ -61,3 +63,40 @@ class Balance(TimeStampedModel):
         return u"[%s] %s: %s" % (self.user, self.type, self.amount)
 
     objects = BalanceManager()
+
+
+class VokoBalanceBase(TimeStampedModel):
+    class Meta:
+        abstract = True
+        verbose_name = verbose_name_plural = ""
+
+    amount = models.DecimalField(max_digits=6, decimal_places=2)
+    description = models.TextField()
+
+    order_round = models.ForeignKey("ordering.OrderRound", null=True, blank=True,
+                                    related_name=Meta.verbose_name_plural.lower(),
+                                    help_text="Optionally link to order round")
+
+    supplier = models.ForeignKey("ordering.Supplier", null=True, blank=True,
+                                 related_name=Meta.verbose_name_plural.lower(),
+                                 help_text="Optionally link to supplier")
+
+    user_balance = models.OneToOneField(Balance, null=True, blank=True,
+                                        related_name=Meta.verbose_name.lower(),
+                                        help_text="User balance, if any")
+
+    def __unicode__(self):
+        return str(self.amount)
+
+
+class VokoIncome(VokoBalanceBase):
+    class Meta:
+        verbose_name = "Inkomste"
+        verbose_name_plural = "Inkomsten"
+
+
+class VokoExpense(VokoBalanceBase):
+    class Meta:
+        verbose_name = "Uitgave"
+        verbose_name_plural = "Uitgaven"
+
