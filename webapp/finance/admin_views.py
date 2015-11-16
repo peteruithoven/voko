@@ -53,6 +53,7 @@ class YearOverview(GroupRequiredMixin, TemplateView):
     def get_context_data(self, year, **kwargs):
         ctx = super(YearOverview, self).get_context_data(**kwargs)
         ctx['year'] = year
+        ctx['current_order_round'] = self.request.current_order_round
         ctx['rounds'] = OrderRound.objects.filter(
             open_for_orders__year=self.kwargs['year']).order_by('-id')  # Rounds that opened in :year:
 

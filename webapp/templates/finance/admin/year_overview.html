@@ -4,7 +4,10 @@
     <h1>{{ year }} - financiën</h1>
     <ul>
     {% for r in rounds %}
-        <li><a href="{% url 'finance.admin.round.overview' r.id %}">{{ r }}</a></li>
+        <li>
+            <a href="{% url 'finance.admin.round.overview' r.id %}">{{ r }}</a>
+            {% if r == current_order_round %} <span class="label label-warning">huidige</span> {% endif %}
+        </li>
     {% empty %}
         Niks!
     {% endfor %}
